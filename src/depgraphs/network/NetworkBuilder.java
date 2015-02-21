@@ -5,15 +5,16 @@
  */
 package depgraphs.network;
 
-import depgraphs.scrapers.JavaScraper;
-import depgraphs.visitors.JavaVisitor;
+import depgraphs.visitors.tools.VisitorNode;
+import depgraphs.env;
+import depgraphs.scraper.ScraperBase;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.graphstream.graph.Graph;
+import java.util.HashSet;
+import java.util.Iterator;
 import org.graphstream.graph.Node;
-import org.graphstream.graph.implementations.SingleGraph;
+import themes.Theme;
 
 /**
  *
@@ -22,75 +23,99 @@ import org.graphstream.graph.implementations.SingleGraph;
 public class NetworkBuilder {
 	Integer index;
 	HashMap<String,Integer> i_map;
-	HashMap<Integer,CodeNode> map;
+	HashMap<Integer,VisitorNode> map;
+	HashMap< Integer, HashSet<Integer> > rel;
+	Theme vis;
+	ScraperBase SCRAPER;
+	boolean log_level;
 	
-	JavaVisitor visitor;
 	
 	public NetworkBuilder() {
-		visitor = new JavaVisitor(this);
 		i_map = new HashMap<>();
+		rel = new HashMap<>();
 		map = new HashMap<>();
 		index = 0;
 	}
 	
+	public void setScraper(ScraperBase o) {
+		this.SCRAPER = o;
+	}
+	
 	public void consume( Collection<File> files ) {
-		Integer i = 0;
-		for( File f : files ) {
-			consume( f, i++ );
+		for (Iterator<File> it = files.iterator(); it.hasNext();) {
+			File f = it.next();
+			if( log_level ) env.log(f.getName());
+			consume( f );
 		}
 	}
 	
-	public void consume( File f, Integer index ) {
-		JavaScraper.scrape(f, index, this);
+	public void consume( File f ) {
+		this.consume( SCRAPER.scrape(f) );
 	}
 	
-	public void consume( CodeNode n, Integer index ) {
-		map.put(index, n);
+	public void consume( VisitorNode n ) {
+		Integer A = getIndex(n.id);
+		n.children.stream().forEach((s) -> {
+			Integer B = getIndex(s);
+			Link( A, B );
+		});
+		map.put(getIndex( n.id ), n);
+	}
+	
+	private void Link(Integer A, Integer B) {
+		if( !rel.containsKey(A) ) 
+			rel.put(A, new HashSet<>());
+		rel.get(A).add(B);
 	}
 	
 	public Integer getIndex(String s) {
 		if( !i_map.containsKey(s) )
 			i_map.put(s, index++);
-		
 		return i_map.get(s);
 	}
 	
-	public void visit(ParseTree pt, Integer index, String s) {
-		visitor.reset();
-		visitor.visit(pt);
-		this.consume( visitor.get(), index );
-	}
 	
 	public void generate() {
+		if( i_map.keySet().iterator().next() == null ) {
+			env.log( " > no enitites found" );
+			return;
+		}
 		
-		Graph g = new SingleGraph("Source");
-		g.addAttribute("ui.stylesheet", ""
-				+ "node { size: 15px, 15px; }"
-				+ "edge { fill-color: #AAA; }"
-				+ "node.core { fill-color: red; }");
-		g.addAttribute("ui.antialias");
-		g.addAttribute("ui.quality");
+
 		
 		for( String s : i_map.keySet()) {
-			Integer i = i_map.get(s);
-			Node n = g.addNode( i.toString());
+			Node n = vis.g.addNode( getIndex(s).toString());
 			n.addAttribute("ui.label", s);
 			if( s.contains("depgraphs") ) {
 				n.addAttribute("ui.class", "core");
 			}
 		}
 		
-		for( CodeNode n : map.values() ) {
-			
-			for( Integer i : n.children ) {
-				String A = n.id.toString();
-				String B = i.toString();
-				if( g.getEdge(A+B) == null  )
-					g.addEdge( A+B, A, B );
-			}
-		}
-		g.display();
+		map.values().stream().forEach((n) -> {
+			n.children.stream().forEach((s) -> {
+				createEdge( n, s );
+			});
+		});
+		vis.g.display();
 		
+	}
+	
+	private void createEdge( VisitorNode n, String s ) {
+		String A = getIndex(n.id).toString();
+		String B = getIndex(s).toString();
+		String C = A+":"+B;
+		if( vis.g.getEdge(C) == null  )
+			vis.g.addEdge( C, A, B );
+		env.log(C);
+	}
+	
+	public NetworkBuilder log(boolean log_level) {
+		this.log_level = log_level;
+		return this;
+	}
+
+	public void setTheme(Theme theme) {
+		this.vis = theme;
 	}
 	
 }
