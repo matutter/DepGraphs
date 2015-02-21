@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package depgraphs.network;
+package depgraphs.visitors.tools;
 
 import java.util.Stack;
 
@@ -11,16 +11,16 @@ import java.util.Stack;
  *
  * @author Mat
  */
-public class CodeNode {
-	Integer id;
-	Stack<Integer> children;
-	public CodeNode() {
+public class VisitorNode {
+	public String id;
+	public Stack<String> children;
+	public VisitorNode() {
 		children = new Stack<>();
 	}
-	public void set(Integer id) {
+	public void set(String id) {
 		this.id = id;
 	}
-	public void push(Integer child) {
+	public void push(String child) {
 		this.children.push(child);
 	}
 }

@@ -6,8 +6,11 @@
 package depgraphs;
 
 import depgraphs.network.NetworkBuilder;
+import depgraphs.scraper.JavaDirectiveScraper;
+import depgraphs.scraper.JavaScraper;
 import java.io.File;
 import java.util.Collection;
+import themes.DefaultTheme;
 
 /**
  *
@@ -20,18 +23,22 @@ public class DepGraphs {
 	 */
 	public static void main(String[] args) {
 		// TODO code application logic here
-		//String path = "C:\\Users\\Mat\\Documents\\NetBeansProjects\\DepGraphs\\src\\depgraphs";
-		String path = "C:\\Users\\Mat\\Documents\\NetBeansProjects";
+		String path = "C:\\Users\\Mat\\Documents\\NetBeansProjects\\DepGraphs\\src\\depgraphs";
+		//String path = "C:\\Users\\Mat\\Documents\\NetBeansProjects";
 
 		env.log(" > starting network sequence ");
 		
 		Collection<File> sources = fs.getSources(path, ".java");
-		NetworkBuilder builder = new NetworkBuilder();
+		NetworkBuilder builder = new NetworkBuilder().log(false);
+		
+		//builder.setScraper(new JavaDirectiveScraper());
+		builder.setScraper(new JavaScraper());
 		
 		builder.consume( sources );
 		
-		builder.generate();
+		builder.setTheme( new DefaultTheme() );
 		
+		builder.generate();
 		
 	}
 	

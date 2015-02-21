@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package depgraphs.visitors;
+package depgraphs.visitor;
 
 import depgraphs.network.NetworkBuilder;
-import depgraphs.network.CodeNode;
+import depgraphs.visitors.tools.VisitorNode;
 import lang.JavaDirectiveBaseVisitor;
 import lang.JavaDirectiveParser;
 
@@ -14,27 +14,15 @@ import lang.JavaDirectiveParser;
  *
  * @author Mat
  */
-public class JavaVisitor extends JavaDirectiveBaseVisitor {
+public class JavaDirectiveVisitor extends JavaDirectiveBaseVisitor {
 
-	private CodeNode node;
-	private NetworkBuilder builder;
+	private VisitorNode node;
 	
-	public JavaVisitor(NetworkBuilder builder) {
+	public JavaDirectiveVisitor(VisitorNode node) {
 		super();
-		node = new CodeNode();
-		this.builder = builder;
+		this.node = node;
 	}
 	
-	
-	
-	public void reset() {
-		node = new CodeNode();
-	}
-	
-	public CodeNode get() {
-		return this.node;
-	}
-
 	@Override
 	public Object visitL_package(JavaDirectiveParser.L_packageContext ctx) {
 		return super.visitL_package(ctx); //To change body of generated methods, choose Tools | Templates.
@@ -44,10 +32,10 @@ public class JavaVisitor extends JavaDirectiveBaseVisitor {
 	public Object visitL_target(JavaDirectiveParser.L_targetContext ctx) {
 		switch( ctx.getParent().getRuleIndex() ) {
 			case JavaDirectiveParser.RULE_l_package:
-				node.set( builder.getIndex( ctx.getParent().getChild(1).getText() ) );
+				node.set( ctx.getParent().getChild(1).getText() );
 			break;
 			case JavaDirectiveParser.RULE_l_directive:
-				node.push( builder.getIndex( ctx.getParent().getChild(1).getText() ) );
+				node.push( ctx.getParent().getChild(1).getText() );
 			break;
 		}
 		return super.visitL_target(ctx); //To change body of generated methods, choose Tools | Templates.
