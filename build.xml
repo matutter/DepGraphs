@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="DepGraphs" default="default" basedir=".">
+    <description>Builds, tests, and runs the project DepGraphs.</description>
+
+
+    <import file="nbproject/build-all-lang.xml"/>
+    <target name="-pre-init" depends="-build-lang-pre-init"/>
+    <target name="-pre-compile" depends="build-lang"/>
+
+    <import file="nbproject/build-impl.xml"/>
+    
+</project>
