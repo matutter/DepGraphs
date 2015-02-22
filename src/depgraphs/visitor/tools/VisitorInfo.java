@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package depgraphs.visitors.tools;
+package depgraphs.visitor.tools;
 
 import java.util.Stack;
 
@@ -11,14 +11,17 @@ import java.util.Stack;
  *
  * @author Mat
  */
-public class VisitorNode {
-	public String id;
+public class VisitorInfo {
+	
+	static 
+	
+	public String name;
 	public Stack<String> children;
-	public VisitorNode() {
+	public VisitorInfo() {
 		children = new Stack<>();
 	}
 	public void set(String id) {
-		this.id = id;
+		this.name = id;
 	}
 	public void push(String child) {
 		this.children.push(child);

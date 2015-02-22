@@ -5,8 +5,7 @@
  */
 package depgraphs.visitor;
 
-import depgraphs.network.NetworkBuilder;
-import depgraphs.visitors.tools.VisitorNode;
+import depgraphs.network.ReferenceMap;
 import lang.JavaDirectiveBaseVisitor;
 import lang.JavaDirectiveParser;
 
@@ -16,11 +15,12 @@ import lang.JavaDirectiveParser;
  */
 public class JavaDirectiveVisitor extends JavaDirectiveBaseVisitor {
 
-	private VisitorNode node;
+	private final ReferenceMap ref;
+	private Integer groupId;
 	
-	public JavaDirectiveVisitor(VisitorNode node) {
+	public JavaDirectiveVisitor(ReferenceMap ref) {
 		super();
-		this.node = node;
+		this.ref = ref;
 	}
 	
 	@Override
@@ -32,10 +32,10 @@ public class JavaDirectiveVisitor extends JavaDirectiveBaseVisitor {
 	public Object visitL_target(JavaDirectiveParser.L_targetContext ctx) {
 		switch( ctx.getParent().getRuleIndex() ) {
 			case JavaDirectiveParser.RULE_l_package:
-				node.set( ctx.getParent().getChild(1).getText() );
+				groupId = ref.updateGroup(ctx.getParent().getChild(1).getText());
 			break;
 			case JavaDirectiveParser.RULE_l_directive:
-				node.push( ctx.getParent().getChild(1).getText() );
+				ref.addMember(groupId, ctx.getParent().getChild(1).getText());
 			break;
 		}
 		return super.visitL_target(ctx); //To change body of generated methods, choose Tools | Templates.

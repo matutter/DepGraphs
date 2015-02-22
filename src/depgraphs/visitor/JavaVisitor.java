@@ -6,7 +6,8 @@
 package depgraphs.visitor;
 
 import depgraphs.env;
-import depgraphs.visitors.tools.VisitorNode;
+import depgraphs.network.ReferenceMap;
+import depgraphs.visitor.tools.VisitorInfo;
 import java.util.List;
 import lang.JavaParser;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -17,38 +18,25 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  */
 public class JavaVisitor extends lang.JavaBaseVisitor {
 	
-	private final VisitorNode node;
+	private final ReferenceMap ref;
+	private Integer groupId;
 	
-	public JavaVisitor(VisitorNode node) {
+	public JavaVisitor(ReferenceMap ref) {
 		super();
-		this.node = node;
+		this.ref = ref;
 	}
 
-	@Override
-	public Object visitClassType(JavaParser.ClassTypeContext ctx) {
-		//env.log( ctx.getText() );
-		return super.visitClassType(ctx); //To change body of generated methods, choose Tools | Templates.
-	}	
-	
 	
 	@Override
 	public Object visitPackageDeclaration(JavaParser.PackageDeclarationContext ctx) {
 		List<TerminalNode> l = ctx.getTokens(JavaParser.Identifier);
 		String s = "";
-		//	node.set();
 		
-		//l = l.subList(1, l.size()-1);
-
 		for(TerminalNode t : l){
-			//env.log( t.getText() );
 			s = s.concat(t.getText()+".");
 		};
-		
 		s =  s.substring(0, s.length()-1);
-		
-		//env.log( s );
-		
-		node.set( s  );
+		groupId = ref.updateGroup(s);
 		
 		return super.visitPackageDeclaration(ctx); //To change body of generated methods, choose Tools | Templates.
 	}
@@ -57,20 +45,8 @@ public class JavaVisitor extends lang.JavaBaseVisitor {
 	public Object visitImportDeclaration(JavaParser.ImportDeclarationContext ctx) {
 		List<TerminalNode> l = ctx.getTokens(JavaParser.Identifier);
 		String s = ctx.getText();
-		//	node.set();
-		
-		//l = l.subList(1, l.size()-1);
 
-		node.push( s.substring(6, s.length()-1) );
-
-		
-//		for(TerminalNode t : l){
-//			s = s.concat(t.getText()+".");
-//		};
-//		if(s.length() > 1)
-//		s =  s.substring(0, s.length()-1);
-		//env.log( s );
-		//node.push(s);
+		ref.addMember(groupId, s.substring(6, s.length()-1));
 		
 		return super.visitImportDeclaration(ctx); //To change body of generated methods, choose Tools | Templates.
 	}

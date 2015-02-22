@@ -5,14 +5,12 @@
  */
 package depgraphs.scraper;
 
-import depgraphs.visitors.tools.VisitorNode;
+import depgraphs.visitor.tools.VisitorInfo;
 import depgraphs.visitor.JavaVisitor;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import lang.JavaDirectiveLexer;
-import lang.JavaDirectiveParser;
 import lang.JavaLexer;
 import lang.JavaParser;
 import org.antlr.v4.runtime.ANTLRFileStream;
@@ -27,7 +25,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
  */
 public class JavaScraper extends ScraperBase {
 		@Override
-		public VisitorNode scrape(File f) {
+		public void scrape(File f) {
 		try {
 			CharStream input = new ANTLRFileStream(f.getCanonicalPath());
 			JavaLexer lex = new JavaLexer(input);
@@ -35,13 +33,10 @@ public class JavaScraper extends ScraperBase {
 			JavaParser parser = new JavaParser(tokens);
 			ParseTree pt = parser.compilationUnit();
 			
-			VisitorNode res = new VisitorNode();
-			JavaVisitor visitor = new JavaVisitor(res);
+			JavaVisitor visitor = new JavaVisitor( ref );
 			visitor.visit(pt);
-			return res;
 		} catch (IOException | RecognitionException ex) {
 			Logger.getLogger(JavaDirectiveScraper.class.getName()).log(Level.SEVERE, null, ex);
 		}
-		return null;
 	}
 }

@@ -5,7 +5,7 @@
  */
 package depgraphs.scraper;
 
-import depgraphs.visitors.tools.VisitorNode;
+import depgraphs.network.ReferenceMap;
 import java.io.File;
 
 /**
@@ -13,5 +13,7 @@ import java.io.File;
  * @author Mat
  */
 public abstract class ScraperBase {
-	public VisitorNode scrape(File f) { return null; }
+	public ReferenceMap ref;
+	public void scrape(File f) { }
+	public ScraperBase setRefMap(ReferenceMap ref) { this.ref = ref; return this; }
 }

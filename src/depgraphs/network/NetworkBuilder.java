@@ -5,108 +5,61 @@
  */
 package depgraphs.network;
 
-import depgraphs.visitors.tools.VisitorNode;
+import depgraphs.visitor.tools.VisitorInfo;
 import depgraphs.env;
+import depgraphs.graphbuilder.DefaultGraphBuilder;
 import depgraphs.scraper.ScraperBase;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import org.graphstream.graph.Node;
-import themes.Theme;
+import java.util.Map;
+import depgraphs.graphbuilder.GraphBuilder;
 
 /**
  *
  * @author Mat
  */
 public class NetworkBuilder {
-	Integer index;
-	HashMap<String,Integer> i_map;
-	HashMap<Integer,VisitorNode> map;
-	HashMap< Integer, HashSet<Integer> > rel;
-	Theme vis;
-	ScraperBase SCRAPER;
+	ScraperBase scraper;
+	GraphBuilder graph;
 	boolean log_level;
-	
+	ReferenceMap ref;
 	
 	public NetworkBuilder() {
-		i_map = new HashMap<>();
-		rel = new HashMap<>();
-		map = new HashMap<>();
-		index = 0;
+		log_level = false;
+		ref = new ReferenceMap();
 	}
 	
-	public void setScraper(ScraperBase o) {
-		this.SCRAPER = o;
+	public NetworkBuilder setScraper(ScraperBase scraper) {
+		this.scraper = scraper.setRefMap( ref );
+		return this;
 	}
 	
-	public void consume( Collection<File> files ) {
-		for (Iterator<File> it = files.iterator(); it.hasNext();) {
-			File f = it.next();
-			if( log_level ) env.log(f.getName());
-			consume( f );
-		}
+	public NetworkBuilder setGraph(GraphBuilder graph) {
+		this.graph = graph;
+		return this;
 	}
-	
-	public void consume( File f ) {
-		this.consume( SCRAPER.scrape(f) );
-	}
-	
-	public void consume( VisitorNode n ) {
-		Integer A = getIndex(n.id);
-		n.children.stream().forEach((s) -> {
-			Integer B = getIndex(s);
-			Link( A, B );
-		});
-		map.put(getIndex( n.id ), n);
-	}
-	
-	private void Link(Integer A, Integer B) {
-		if( !rel.containsKey(A) ) 
-			rel.put(A, new HashSet<>());
-		rel.get(A).add(B);
-	}
-	
-	public Integer getIndex(String s) {
-		if( !i_map.containsKey(s) )
-			i_map.put(s, index++);
-		return i_map.get(s);
-	}
-	
-	
-	public void generate() {
-		if( i_map.keySet().iterator().next() == null ) {
-			env.log( " > no enitites found" );
-			return;
-		}
-		
 
-		
-		for( String s : i_map.keySet()) {
-			Node n = vis.g.addNode( getIndex(s).toString());
-			n.addAttribute("ui.label", s);
-			if( s.contains("depgraphs") ) {
-				n.addAttribute("ui.class", "core");
-			}
-		}
-		
-		map.values().stream().forEach((n) -> {
-			n.children.stream().forEach((s) -> {
-				createEdge( n, s );
-			});
-		});
-		vis.g.display();
-		
+	public ReferenceMap getRefMap() {
+		return ref;
+	}
+
+	public NetworkBuilder build( Collection<File> files ) {
+		files.forEach((f)->{ build( f ); });
+		return this;
 	}
 	
-	private void createEdge( VisitorNode n, String s ) {
-		String A = getIndex(n.id).toString();
-		String B = getIndex(s).toString();
-		String C = A+":"+B;
-		if( vis.g.getEdge(C) == null  )
-			vis.g.addEdge( C, A, B );
-		env.log(C);
+	public NetworkBuilder build( File f ) {
+		if( log_level ) env.log(f.getName());
+		scraper.scrape(f);
+		return this;
+	}
+	
+	public NetworkBuilder render() {
+		graph.setRefMap(ref).render();
+		return this;
 	}
 	
 	public NetworkBuilder log(boolean log_level) {
@@ -114,8 +67,4 @@ public class NetworkBuilder {
 		return this;
 	}
 
-	public void setTheme(Theme theme) {
-		this.vis = theme;
-	}
-	
 }
