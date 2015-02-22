@@ -39,11 +39,13 @@ public abstract class GraphBuilder {
 	
 	
 	public void createParentNode(Integer index, String name) {
-		Node n = g.addNode(index.toString() );
-		if( name != null ) {
-			n.addAttribute("ui.label",  name );
-			if( name.contains("depgraphs") ) {
-				n.addAttribute("ui.class", "core");
+		if( g.getNode(index.toString()) == null ) {
+			Node n = g.addNode(index.toString() );
+			if( name != null ) {
+				n.addAttribute("ui.label",  name );
+				if( name.contains("depgraphs") ) {
+					n.addAttribute("ui.class", "core");
+				}
 			}
 		}
 	}

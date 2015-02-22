@@ -5,16 +5,10 @@
  */
 package depgraphs.network;
 
-import depgraphs.visitor.tools.VisitorInfo;
 import depgraphs.env;
-import depgraphs.graphbuilder.DefaultGraphBuilder;
-import depgraphs.scraper.ScraperBase;
+import depgraphs.scraper.Scraper;
 import java.io.File;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import depgraphs.graphbuilder.GraphBuilder;
 
 /**
@@ -22,7 +16,7 @@ import depgraphs.graphbuilder.GraphBuilder;
  * @author Mat
  */
 public class NetworkBuilder {
-	ScraperBase scraper;
+	Scraper scraper;
 	GraphBuilder graph;
 	boolean log_level;
 	ReferenceMap ref;
@@ -32,7 +26,7 @@ public class NetworkBuilder {
 		ref = new ReferenceMap();
 	}
 	
-	public NetworkBuilder setScraper(ScraperBase scraper) {
+	public NetworkBuilder setScraper(Scraper scraper) {
 		this.scraper = scraper.setRefMap( ref );
 		return this;
 	}

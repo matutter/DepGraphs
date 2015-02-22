@@ -42,6 +42,15 @@ public class ReferenceMap {
 		return groupId;
 	}
 	
+	public Integer updateGroup(Integer groupId, Integer childId) {
+		if( !groups.containsKey(groupId) )
+			groups.put(groupId, new HashSet<>());
+		
+		groups.get(groupId).add(childId);
+		
+		return childId;
+	}
+	
 	public Integer addMember(Integer groupId, String s) {
 		Integer id = updateId(s);
 		HashSet ref = getGroup( groupId );

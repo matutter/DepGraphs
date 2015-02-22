@@ -12,8 +12,8 @@ import java.io.File;
  *
  * @author Mat
  */
-public abstract class ScraperBase {
+public abstract class Scraper {
 	public ReferenceMap ref;
-	public void scrape(File f) { }
-	public ScraperBase setRefMap(ReferenceMap ref) { this.ref = ref; return this; }
+	public abstract void scrape(File f) ;
+	public Scraper setRefMap(ReferenceMap ref) { this.ref = ref; return this; }
 }

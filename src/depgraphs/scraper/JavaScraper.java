@@ -5,7 +5,6 @@
  */
 package depgraphs.scraper;
 
-import depgraphs.visitor.tools.VisitorInfo;
 import depgraphs.visitor.JavaVisitor;
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +22,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
  *
  * @author Mat
  */
-public class JavaScraper extends ScraperBase {
+public class JavaScraper extends Scraper {
 		@Override
 		public void scrape(File f) {
 		try {

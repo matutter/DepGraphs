@@ -39,12 +39,9 @@ public class DefaultGraphBuilder extends GraphBuilder {
 				
 				this.createEdge(id, childId);
 				
-				
 			});
 			
 		});
-		
-		
 	
 	}
 }

@@ -5,7 +5,6 @@
  */
 package depgraphs.scraper;
 
-import depgraphs.visitor.tools.VisitorInfo;
 import depgraphs.visitor.JavaDirectiveVisitor;
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +22,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
  *
  * @author Mat
  */
-public class JavaDirectiveScraper extends ScraperBase {
+public class JavaDirectiveScraper extends Scraper {
 	@Override
 	public void scrape(File f) {
 		try {
@@ -33,7 +32,6 @@ public class JavaDirectiveScraper extends ScraperBase {
 			JavaDirectiveParser parser = new JavaDirectiveParser(tokens);
 			ParseTree pt = parser.lang_source();
 			
-			VisitorInfo res = new VisitorInfo();
 			JavaDirectiveVisitor visitor = new JavaDirectiveVisitor(ref);
 			visitor.visit(pt);
 		} catch (IOException | RecognitionException ex) {

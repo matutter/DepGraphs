@@ -10,6 +10,7 @@ import depgraphs.scraper.JavaScraper;
 import java.io.File;
 import java.util.Collection;
 import depgraphs.graphbuilder.DefaultGraphBuilder;
+import depgraphs.scraper.FsScraper;
 import depgraphs.scraper.JavaDirectiveScraper;
 
 /**
@@ -22,21 +23,19 @@ public class DepGraphs {
 	 * @param args the command line arguments
 	 */
 	public static void main(String[] args) {
-		// TODO code application logic here
-		//String path = "C:\\Users\\Mat\\Documents\\NetBeansProjects\\DepGraphs\\src\\depgraphs";
-		String path = "C:\\Users\\Mat\\Documents\\NetBeansProjects";
+
+		String path = "C:\\Users\\Mat\\Documents\\NetBeansProjects\\DepGraphs\\src\\depgraphs";
 
 		env.log(" > starting network sequence ");
 		
 		Collection<File> sources = fs.getSources(path, ".java");
+		//Collection<File> sources = fs.getSources(path, "");
 		NetworkBuilder builder = new NetworkBuilder().log(false);
-		
+
 		builder.setGraph( new DefaultGraphBuilder() )
 			.setScraper( new JavaDirectiveScraper() )
 			.build( sources )
 			.render();
-		
-		
 		
 	}
 	

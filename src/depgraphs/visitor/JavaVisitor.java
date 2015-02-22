@@ -5,9 +5,7 @@
  */
 package depgraphs.visitor;
 
-import depgraphs.env;
 import depgraphs.network.ReferenceMap;
-import depgraphs.visitor.tools.VisitorInfo;
 import java.util.List;
 import lang.JavaParser;
 import org.antlr.v4.runtime.tree.TerminalNode;
