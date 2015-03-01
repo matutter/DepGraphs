@@ -1,0 +1,14 @@
+S=5
+Identifier=6
+LINE_COMMENT=8
+EXTRA=10
+END=4
+WS=9
+KeyWordPackage=2
+COMMENT=7
+KeyWorkImport=1
+SEP=3
+'.'=3
+'import'=1
+';'=4
+'package'=2
