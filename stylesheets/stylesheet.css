@@ -35,6 +35,18 @@ footer, header, hgroup, menu, nav, section {
   display: block;
 }
 
+.bg {
+background: #0d2321; /* Old browsers */
+background: -moz-linear-gradient(-45deg,  #0d2321 0%, #0b464c 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,#0d2321), color-stop(100%,#0b464c)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(-45deg,  #0d2321 0%,#0b464c 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(-45deg,  #0d2321 0%,#0b464c 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(-45deg,  #0d2321 0%,#0b464c 100%); /* IE10+ */
+background: linear-gradient(135deg,  #0d2321 0%,#0b464c 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0d2321', endColorstr='#0b464c',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+}
+
 ol, ul {
   list-style: none;
 }
@@ -287,12 +299,7 @@ Full-Width Styles
 }
 
 #header_wrap {
-  background: #212121;
-  background: -moz-linear-gradient(top, #373737, #212121);
-  background: -webkit-linear-gradient(top, #373737, #212121);
-  background: -ms-linear-gradient(top, #373737, #212121);
-  background: -o-linear-gradient(top, #373737, #212121);
-  background: linear-gradient(top, #373737, #212121);
+ 
 }
 
 #header_wrap .inner {
