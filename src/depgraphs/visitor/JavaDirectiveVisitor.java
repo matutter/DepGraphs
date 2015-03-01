@@ -5,7 +5,9 @@
  */
 package depgraphs.visitor;
 
-import depgraphs.network.ReferenceMap;
+import depgraphs.env;
+import depgraphs.eventful.EventAdapter;
+import java.util.Arrays;
 import lang.JavaDirectiveBaseVisitor;
 import lang.JavaDirectiveParser;
 
@@ -15,30 +17,34 @@ import lang.JavaDirectiveParser;
  */
 public class JavaDirectiveVisitor extends JavaDirectiveBaseVisitor {
 
-	private final ReferenceMap ref;
-	private Integer groupId;
+	EventAdapter adapter;
+	String tail;
 	
-	public JavaDirectiveVisitor(ReferenceMap ref) {
-		super();
-		this.ref = ref;
-	}
-	
-	@Override
-	public Object visitL_package(JavaDirectiveParser.L_packageContext ctx) {
-		return super.visitL_package(ctx); //To change body of generated methods, choose Tools | Templates.
+	public void useAdapter( EventAdapter adapter ) {
+		this.adapter = adapter;
 	}
 	
 	@Override
 	public Object visitL_target(JavaDirectiveParser.L_targetContext ctx) {
-		switch( ctx.getParent().getRuleIndex() ) {
-			case JavaDirectiveParser.RULE_l_package:
-				groupId = ref.updateGroup(ctx.getParent().getChild(1).getText());
-			break;
-			case JavaDirectiveParser.RULE_l_directive:
-				ref.addMember(groupId, ctx.getParent().getChild(1).getText());
-			break;
+		String s = ctx.getParent().getChild(1).getText();
+		String[] ss = s.split("\\.");
+		if( ss.length > 0 ) {
+			switch( ctx.getParent().getRuleIndex() ) {
+				case JavaDirectiveParser.RULE_l_package:
+
+					adapter.getGraph().addChain( ss );
+					this.tail = ss[ ss.length - 1 ];
+					
+				break;
+				case JavaDirectiveParser.RULE_l_directive:
+
+					adapter.getGraph().addChain(  ss );
+					adapter.getGraph().connect( tail , ss[0] );
+
+				break;
+			}
 		}
-		return super.visitL_target(ctx); //To change body of generated methods, choose Tools | Templates.
+		return super.visitL_target(ctx);
 	}
 	
 }

@@ -5,7 +5,7 @@
  */
 package depgraphs.visitor;
 
-import depgraphs.network.ReferenceMap;
+//import depgraphs.network.ReferenceMap;
 import java.util.List;
 import lang.JavaParser;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -16,13 +16,13 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  */
 public class JavaVisitor extends lang.JavaBaseVisitor {
 	
-	private final ReferenceMap ref;
+//	private final ReferenceMap ref;
 	private Integer groupId;
 	
-	public JavaVisitor(ReferenceMap ref) {
-		super();
-		this.ref = ref;
-	}
+//	public JavaVisitor(ReferenceMap ref) {
+//		super();
+//		this.ref = ref;
+//	}
 
 	
 	@Override
@@ -33,8 +33,8 @@ public class JavaVisitor extends lang.JavaBaseVisitor {
 		for(TerminalNode t : l){
 			s = s.concat(t.getText()+".");
 		};
-		s =  s.substring(0, s.length()-1);
-		groupId = ref.updateGroup(s);
+//		s =  s.substring(0, s.length()-1);
+//		groupId = ref.updateGroup(s);
 		
 		return super.visitPackageDeclaration(ctx); //To change body of generated methods, choose Tools | Templates.
 	}
@@ -44,7 +44,7 @@ public class JavaVisitor extends lang.JavaBaseVisitor {
 		List<TerminalNode> l = ctx.getTokens(JavaParser.Identifier);
 		String s = ctx.getText();
 
-		ref.addMember(groupId, s.substring(6, s.length()-1));
+//		ref.addMember(groupId, s.substring(6, s.length()-1));
 		
 		return super.visitImportDeclaration(ctx); //To change body of generated methods, choose Tools | Templates.
 	}

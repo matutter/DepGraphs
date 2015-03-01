@@ -5,6 +5,7 @@
  */
 package depgraphs.scraper;
 
+import depgraphs.eventful.EventAdapter;
 import depgraphs.visitor.JavaVisitor;
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +25,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
  */
 public class JavaScraper extends Scraper {
 		@Override
-		public void scrape(File f) {
+		public void scrape(File f, EventAdapter adapter) {
 		try {
 			CharStream input = new ANTLRFileStream(f.getCanonicalPath());
 			JavaLexer lex = new JavaLexer(input);
@@ -32,8 +33,8 @@ public class JavaScraper extends Scraper {
 			JavaParser parser = new JavaParser(tokens);
 			ParseTree pt = parser.compilationUnit();
 			
-			JavaVisitor visitor = new JavaVisitor( ref );
-			visitor.visit(pt);
+//			JavaVisitor visitor = new JavaVisitor( ref );
+//			visitor.visit(pt);
 		} catch (IOException | RecognitionException ex) {
 			Logger.getLogger(JavaDirectiveScraper.class.getName()).log(Level.SEVERE, null, ex);
 		}
