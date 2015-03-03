@@ -9,6 +9,7 @@ import depgraphs.eventful.Eventful;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
 /**
@@ -17,20 +18,23 @@ import javax.swing.JToolBar;
  */
 public class Toolbar extends Eventful implements Element {
 	JToolBar t;
+	public Input field;
 	public Toolbar() {
 		t = new JToolBar();
-	//	t.setLayout(new FlowLayout());
 		t.setBackground( new Color(0,0,0,0) );
-		t.setOpaque(true);
 		t.setBorderPainted(false);
 		t.setFloatable(false);
 		t.setRollover(true);
+		t.setOpaque(true);
 		
 		Btn toggle_btn = new Btn( "layout", "Layout On", this ).setAltText( "Layout Off" );
 		Btn load_btn = new Btn( "load", "load", this );
 		
+		field = new Input();
+		
 		t.add( toggle_btn );
 		t.add( load_btn );
+		t.add( field );
 	}
 	
 	@Override

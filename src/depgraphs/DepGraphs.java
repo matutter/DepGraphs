@@ -25,7 +25,7 @@ public class DepGraphs {
 	 */
 	
 	public static void main(String[] args) {
-		String path = "C:\\Users\\Mat\\Documents\\NetBeansProjects\\DepGraphs\\src\\depgraphs";
+		//String path = "C:\\Users\\Mat\\Documents\\NetBeansProjects\\DepGraphs\\src\\depgraphs";
 		env.log(" > starting network sequence ");
 
 		EventAdapter adapter = new EventAdapter();
@@ -46,7 +46,9 @@ public class DepGraphs {
 		});
 		
 		toolbar.on("load-click", (Object sender, Object obj)->{
-			adapter.loadOnNextTick( path );
+			adapter.clear( (ctx)->{
+				ctx.loadOnNextTick( toolbar.field.getText() );
+			});
 		});
 		
 		JFrame f = builder.build();

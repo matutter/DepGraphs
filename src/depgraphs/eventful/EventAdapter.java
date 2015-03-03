@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
 
 /**
  *
@@ -27,7 +28,7 @@ import java.util.concurrent.ExecutorService;
 public class EventAdapter implements Runnable {
 	Stack<String> nextTick;
 	GStreamGraph g;
-	
+
 	public GStreamGraph getGraph() {
 		return g;
 	}
@@ -50,6 +51,13 @@ public class EventAdapter implements Runnable {
 		nextTick.push(s);
 	}
 	
+	public synchronized EventAdapter clear( Consumer<EventAdapter> cb ) {
+		this.g.clear();
+		env.log("removing  edges");
+		cb.accept( this );
+		return this;
+	}
+	
 	@Override
 	public void run() {
 		System.out.println(" > Sym starting");
@@ -61,20 +69,21 @@ public class EventAdapter implements Runnable {
 				if( rendering ) {
 					while( !nextTick.empty() ) {
 						String s = nextTick.lastElement();
-					//	env.log( s );
 						nextTick.pop();
 						
+						env.log("parsing project " + s);
+
 						File f = new File( s );
 						if( f.exists() ) {
 							try {
 								Collection<File> files = fs.getSources( f.getCanonicalPath() , ".java");
 								JavaDirectiveScraper scraper = new JavaDirectiveScraper();
-								
+
 								files.stream().filter( file -> file.exists() && file.canRead() ).forEach((file)->{
 									//env.log( file.getName() );
 									scraper.scrape(file, this);
 								});
-								
+
 							} catch( IOException e ) {
 							//	env.log( f.getName() + " FAIL" );
 							}

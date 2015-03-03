@@ -9,9 +9,10 @@ import depgraphs.eventful.Eventful;
 import java.awt.Component;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
-import org.graphstream.graph.implementations.MultiGraph;
+import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.swingViewer.View;
 import org.graphstream.ui.swingViewer.Viewer;
 
@@ -24,7 +25,7 @@ public class GStreamGraph extends Eventful implements Element {
 	ConcurrentHashMap<String, String> _map;
 	Integer _index;
 	Viewer vr;
-	final Graph g;
+	public final Graph g;
 	View v;
 	
 	boolean _auto;
@@ -36,7 +37,7 @@ public class GStreamGraph extends Eventful implements Element {
 		_index = 0;
 		_auto = true;
 		
-		g = new MultiGraph("GS");
+		g = new SingleGraph("GS");
 		g.addAttribute("ui.antialias");
 		g.addAttribute("ui.quality");
 		g.addAttribute("ui.stylesheet", css );
@@ -46,8 +47,13 @@ public class GStreamGraph extends Eventful implements Element {
 		vr.enableAutoLayout();
 		
 		v = vr.addDefaultView(false);
-		
-		
+	}
+	
+	public void clear() {
+		_map.clear();
+		_index = 0;
+		this.g.getEdgeSet().removeIf( edge -> true );
+		this.g.getNodeSet().removeIf( vertex -> true );
 	}
 	
 	// mapping mechanics
