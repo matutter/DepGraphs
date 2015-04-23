@@ -12,6 +12,8 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JLayeredPane;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 /**
  *
@@ -78,9 +80,9 @@ public class UIBuilder {
 		if( dim == null )
 			dim = new Dimension(500,600);
 		
-		toolbar.setBounds(0,0,400,40);
+//		toolbar.setBounds(0,0,400,40);
 		
-		p.add( toolbar.getComponent(), BorderLayout.CENTER );
+		p.add( toolbar.getComponent(), BorderLayout.NORTH );
 		p.add( gs.getComponent(), BorderLayout.CENTER );
 		
 		p.setPreferredSize( dim );

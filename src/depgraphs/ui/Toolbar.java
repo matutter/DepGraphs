@@ -5,46 +5,84 @@
  */
 package depgraphs.ui;
 
+import depgraphs.DepGraphs;
 import depgraphs.eventful.Eventful;
+import depgraphs.ui.style.css;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
-import javax.swing.JTextField;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageFilter;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Enumeration;
+
+import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.GrayFilter;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import javax.swing.Timer;
 
 /**
  *
  * @author Mat
  */
-public class Toolbar extends Eventful implements Element {
-	JToolBar t;
-	public Input field;
+public final class Toolbar extends Eventful  {
+//	JToolBar t;
+	JPanel p, l, r;
+	
+	Timer loader;
+	IconBtn loadIco;
+	
 	public Toolbar() {
-		t = new JToolBar();
-		t.setBackground( new Color(0,0,0,0) );
-		t.setBorderPainted(false);
-		t.setFloatable(false);
-		t.setRollover(true);
-		t.setOpaque(true);
+		p = new JPanel();
+		l = new JPanel();
+		r = new JPanel();
+		p.setLayout(new BorderLayout());
+		l.setLayout(new FlowLayout());
+		r.setLayout(new FlowLayout());
+		p.add(l,BorderLayout.WEST);
+		p.add(r,BorderLayout.EAST);
+		l.setBackground(Color.WHITE);
+		r.setBackground(Color.WHITE);
+		p.setBackground(Color.WHITE);
 		
-		Btn toggle_btn = new Btn( "layout", "Layout On", this ).setAltText( "Layout Off" );
-		Btn load_btn = new Btn( "load", "load", this );
+		IconBtn toggle_btn = new IconBtn( "layout", "lock.png", this );
+		IconBtn load_btn = new IconBtn( "load", "folder.png", this ).setAutoToggle(false);
+		loadIco = new IconBtn( null, "loader_sm.gif", this ).setAutoToggle(false);
 		
-		field = new Input();
+		toggle_btn.setActive(false);
 		
-		t.add( toggle_btn );
-		t.add( load_btn );
-		t.add( field );
+		l.add(load_btn);
+		r.add(toggle_btn);
+		
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBackground(Color.WHITE);
+		panel.add(Box.createHorizontalGlue());
+		panel.add(loadIco);
+		panel.add(Box.createHorizontalGlue());
+		p.add(panel,BorderLayout.CENTER);
+		showLoader(false);
 	}
 	
-	@Override
+	public void showLoader(Boolean b) {
+		loadIco.setVisible(b);
+	}
+	
 	public Component getComponent() {
-		return t;
+		return p;
 	}
 
-	@Override
-	public Component setBounds(int x, int y, int span_x, int span_y) {
-		t.setBounds(x, y, span_x, span_y);
-		return t;
-	}
 }

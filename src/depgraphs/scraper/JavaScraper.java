@@ -33,8 +33,12 @@ public class JavaScraper extends Scraper {
 			JavaParser parser = new JavaParser(tokens);
 			ParseTree pt = parser.compilationUnit();
 			
-//			JavaVisitor visitor = new JavaVisitor( ref );
-//			visitor.visit(pt);
+			JavaVisitor visitor = new JavaVisitor( f.getName().replace(".java", "") );
+			visitor.visit(pt);
+			
+			Collector<String> col = visitor.collect();
+			System.out.println( col.toString() );
+			
 		} catch (IOException | RecognitionException ex) {
 			Logger.getLogger(JavaDirectiveScraper.class.getName()).log(Level.SEVERE, null, ex);
 		}

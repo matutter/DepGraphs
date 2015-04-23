@@ -23,7 +23,7 @@ public class Eventful {
 	public Eventful register( String evName ) {
 		if( !events.containsKey(evName) ) {
 			events.put(evName, new HashSet<>() );
-			System.out.println( "Registered " + evName );
+//			System.out.println( "Registered " + evName );
 		}
 		return this;
 	}

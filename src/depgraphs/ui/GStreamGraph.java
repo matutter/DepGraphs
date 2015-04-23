@@ -6,10 +6,13 @@
 package depgraphs.ui;
 
 import depgraphs.eventful.Eventful;
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import javax.swing.JPanel;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
@@ -22,10 +25,10 @@ import org.graphstream.ui.swingViewer.Viewer;
  */
 public class GStreamGraph extends Eventful implements Element {
 	
-	ConcurrentHashMap<String, String> _map;
+	final ConcurrentHashMap<String, String> _map;
+	public final Graph g;
 	Integer _index;
 	Viewer vr;
-	public final Graph g;
 	View v;
 	
 	boolean _auto;
@@ -57,30 +60,44 @@ public class GStreamGraph extends Eventful implements Element {
 	}
 	
 	// mapping mechanics
-	private String map(String s) {
-		if( _map.containsKey(s) )
-			return _map.get(s);
-		_map.put(s, (_index++).toString());
-		synchronized(g) {
-			Node n = g.addNode( _map.get(s) );
-			n.addAttribute("ui.label", s);
-			//n.setAttribute("weight", _index);
+	private synchronized String map(String s) {
+		try { 
+			synchronized(_map) {
+	//			synchronized(g) {
+				if( _map.containsKey(s) )
+					return _map.get(s);
+
+				_map.put(s, (_index++).toString());
+					Node n = g.addNode( _map.get(s) );
+					n.addAttribute("ui.label", s);
+					//n.setAttribute("weight", _index);
+	//			}
+				return _map.get(s);
+			}
+		} catch ( Exception ex ) {
+			return null;
 		}
-		return _map.get(s);
 	}
 	
 	public void connect(String A, String B) {
-		String a = map(A);
-		String b = map(B);
-		if( a != b )
-			connectMap(a,b);
+		if( A == null ) return;
+		if( B == null ) return;
+		
+		synchronized(_map) {
+			String a = map(A);
+			String b = map(B);
+			if( a != b )
+				connectMap(a,b);
+		}
 	}
 	
 	public void connectMap(String a, String b) {
-		if( g.getEdge(a+"--"+b) != null ) return;
-		if( g.getEdge(b+"--"+a) != null ) return;
-		
-		g.addEdge(a+"--"+b, a, b);
+		synchronized(g) {
+			if( g.getEdge(a+"--"+b) != null ) return;
+			if( g.getEdge(b+"--"+a) != null ) return;
+
+			g.addEdge(a+"--"+b, a, b);
+		}
 	}
 	
 	public GStreamGraph startAuto() {
@@ -102,12 +119,15 @@ public class GStreamGraph extends Eventful implements Element {
 
 	@Override
 	public Component getComponent() {
-		return v;
+		JPanel p = new JPanel();
+		p.setLayout(new BorderLayout());
+		p.add(v,BorderLayout.CENTER);
+		return p;
 	}
 
 	@Override
 	public Component setBounds(int x, int y, int span_x, int span_y) {
-		v.setBounds(x, y, span_x, span_y);
+//		v.setBounds(x, y, span_x, span_y);
 		return v;
 	}
 	
@@ -140,22 +160,27 @@ public class GStreamGraph extends Eventful implements Element {
 //	}
 	
 	public void addChain( String[] each ) {
-		Stack<String> ids = getStackIds( each );
-		String last = null;
-		while( !ids.empty() ) {
-			if( last != null )
-				this.connectMap(last, ids.lastElement());
-			else {
+		synchronized(g) {
+			Stack<String> ids = getStackIds( each );
+			String last = null;
+			while( !ids.empty() ) {
+				if( last != null )
+					this.connectMap(last, ids.lastElement());
+				else {
+				}
+
+				last = ids.lastElement();
+				ids.pop();
 			}
-				
-			last = ids.lastElement();
-			ids.pop();
 		}
-		
 	}
 	
 	public boolean autoIsOn() {
 		return _auto;
+	}
+
+	public void addChain(List<String> ss) {
+		this.addChain(ss.toArray(new String[4]));
 	}
 	
 }

@@ -29,7 +29,7 @@ public class Input extends JTextField {
 		
 		this.setDragEnabled(false);
 		this.setDoubleBuffered(false);
-		this.setBackground( new Color(0,0,0,48) );
+		this.setBackground( new Color(0xAA,0xAA,0xAA) );
 		this.setForeground( Color.WHITE );
 		this.setBorder( BorderFactory.createEmptyBorder(8, 8, 8, 8) );
 		

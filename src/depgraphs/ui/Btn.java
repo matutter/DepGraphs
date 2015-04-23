@@ -22,7 +22,7 @@ import javax.swing.JLabel;
  */
 public class Btn extends JLabel {
 	
-	Color active_hover_foreground_color = Color.WHITE;
+	Color active_hover_foreground_color = Color.ORANGE;
 	Color alt_normal_color = Color.ORANGE;
 	Color normal_color = Color.GRAY;
 	String altText;
@@ -30,7 +30,6 @@ public class Btn extends JLabel {
 	
 	public Btn(String id, String s, Eventful parent){
 		super(s);
-		this._id = id;
 		this.setName(s);
 		this.setForeground( normal_color );
 		this.setBackground( new Color(0,0,0,0) );
@@ -38,38 +37,39 @@ public class Btn extends JLabel {
 		
 		this.setCursor( new Cursor( Cursor.HAND_CURSOR ) );
 		
-		String evName = _id+"-click";
-		
-		parent.register( evName );
-		
-		this.addMouseMotionListener( new MouseMotionListener(){
-			@Override
-			public void mouseDragged(MouseEvent e) {}
-			@Override
-			public void mouseMoved(MouseEvent e) {}
-		} );
-		
-		this.addMouseListener(new MouseListener() {
+		if( id != null ) {
+			this._id = id;
+			String evName = _id+"-click";
+			parent.register( evName );
 
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				altSwap();
-				parent.fire(evName, parent, e);
-			}
-			@Override
-			public void mousePressed(MouseEvent e) {}
-			@Override
-			public void mouseReleased(MouseEvent e) {
-			}
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				setHover(true);
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				setHover(false);
-			}
-		});
+			this.addMouseMotionListener( new MouseMotionListener(){
+				@Override
+				public void mouseDragged(MouseEvent e) {}
+				@Override
+				public void mouseMoved(MouseEvent e) {}
+			} );
+			this.addMouseListener(new MouseListener() {
+
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					altSwap();
+					parent.fire(evName, parent, e);
+				}
+				@Override
+				public void mousePressed(MouseEvent e) {}
+				@Override
+				public void mouseReleased(MouseEvent e) {
+				}
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					setHover(true);
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {
+					setHover(false);
+				}
+			});
+		}
 	}
 	
 	public void setHover(boolean tof) {

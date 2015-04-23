@@ -8,10 +8,12 @@ package depgraphs.eventful;
 import depgraphs.env;
 import depgraphs.fs;
 import depgraphs.scraper.JavaDirectiveScraper;
+import depgraphs.scraper.JavaScraper;
 import depgraphs.ui.GStreamGraph;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Optional;
 
 import java.util.Random;
 import java.util.Stack;
@@ -27,6 +29,8 @@ import java.util.function.Consumer;
  */
 public class EventAdapter implements Runnable {
 	Stack<String> nextTick;
+	Optional<Runnable> noActivity = Optional.empty();
+	Optional<Runnable> activity = Optional.empty();
 	GStreamGraph g;
 
 	public GStreamGraph getGraph() {
@@ -40,6 +44,14 @@ public class EventAdapter implements Runnable {
 	public EventAdapter addGraph( GStreamGraph g ) {
 		this.g = g;
 		return this;
+	}
+	
+	public void setNoActivityIndicator(Runnable noActivity) {
+		this.noActivity = Optional.ofNullable(noActivity);
+	}
+	
+	public void setActivityIndicator(Runnable activity) {
+		this.activity = Optional.ofNullable(activity);
 	}
 	
 	public void runInAnotherThread() {
@@ -67,6 +79,7 @@ public class EventAdapter implements Runnable {
 		while( !Thread.interrupted() ) {
 			try {
 				if( rendering ) {
+					activity.ifPresent(Runnable::run);
 					while( !nextTick.empty() ) {
 						String s = nextTick.lastElement();
 						nextTick.pop();
@@ -75,9 +88,10 @@ public class EventAdapter implements Runnable {
 
 						File f = new File( s );
 						if( f.exists() ) {
+							System.out.println("Parsing " + f.getName());
 							try {
 								Collection<File> files = fs.getSources( f.getCanonicalPath() , ".java");
-								JavaDirectiveScraper scraper = new JavaDirectiveScraper();
+								JavaScraper scraper = new JavaScraper();
 
 								files.stream().filter( file -> file.exists() && file.canRead() ).forEach((file)->{
 									//env.log( file.getName() );
@@ -95,7 +109,10 @@ public class EventAdapter implements Runnable {
 					
 					if( !nextTick.empty() )
 						rendering = true;
-					
+					else {
+						Thread.sleep( lock.delay );
+						noActivity.ifPresent(Runnable::run);
+					}
 					if( lock.ping() ) {
 						g.refresh();
 					}
