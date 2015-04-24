@@ -37,7 +37,7 @@ public class JavaScraper extends Scraper {
 			visitor.visit(pt);
 			
 			Collector<String> col = visitor.collect();
-			System.out.println( col.toString() );
+//			System.out.println( col.toString() );
 			
 		} catch (IOException | RecognitionException ex) {
 			Logger.getLogger(JavaDirectiveScraper.class.getName()).log(Level.SEVERE, null, ex);

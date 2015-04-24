@@ -31,7 +31,8 @@ public class JavaVisitor<T> extends lang.JavaBaseVisitor<T> {
 	
 	public JavaVisitor(String domain) {
 		super();
-		col = new Collector<>(domain);
+		col = new Collector<>(Arrays.asList( domain.split("//.") ));
+		System.out.println( this.col );
 	}
 
 	@Override public T visitClassInstanceCreationExpression_lfno_primary(@NotNull JavaParser.ClassInstanceCreationExpression_lfno_primaryContext ctx) {
@@ -741,36 +742,12 @@ public class JavaVisitor<T> extends lang.JavaBaseVisitor<T> {
 	 */
 	@Override public T visitInclusiveOrExpression(@NotNull JavaParser.InclusiveOrExpressionContext ctx) { return visitChildren(ctx); }
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitInterfaceMethodModifier(@NotNull JavaParser.InterfaceMethodModifierContext ctx) { return visitChildren(ctx); }
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitResourceSpecification(@NotNull JavaParser.ResourceSpecificationContext ctx) { return visitChildren(ctx); }
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitInterfaceTypeList(@NotNull JavaParser.InterfaceTypeListContext ctx) { return visitChildren(ctx); }
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitIfThenElseStatementNoShortIf(@NotNull JavaParser.IfThenElseStatementNoShortIfContext ctx) { return visitChildren(ctx); }
 
 	@Override public T visitUnannInterfaceType(@NotNull JavaParser.UnannInterfaceTypeContext ctx) { return visitChildren(ctx); }
@@ -788,7 +765,7 @@ public class JavaVisitor<T> extends lang.JavaBaseVisitor<T> {
 	}
 
 	@Override public T visitImportDeclaration(@NotNull JavaParser.ImportDeclarationContext ctx) {
-		System.out.println( ctx.getChild(0).getChild(1).getText() );
+//		System.out.println( ctx.getChild(0).getChild(1).getText() );
 		return visitChildren(ctx);
 	}
 

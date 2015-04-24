@@ -5,7 +5,9 @@
  */
 package depgraphs.scraper;
 
+import depgraphs.ui.FQNTree;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  *
@@ -13,20 +15,21 @@ import java.util.HashSet;
  * @param <T> Type to collect
  */
 public final class Collector<T> extends HashSet<T> {
-	T domain;
+	List<T> domain;
+	FQNTree fqn;
 	
-	public Collector(T domain) {
+	public Collector(List<T> domain) {
 		super();
 		setDomain(domain);
 	}
 	
-	public void setDomain(T domain) {
+	public void setDomain(List<T> domain) {
 		this.domain = domain;
 	}
 	
 	@Override
 	public String toString() {
-		return "Domain: ".concat(domain.toString()).concat(", ") + super.toString(); //To change body of generated methods, choose Tools | Templates.
+		return "Domain: ".concat(domain.toString()).concat(", ") + super.toString();
 	}
 	
 }
