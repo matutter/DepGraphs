@@ -5,10 +5,14 @@
  */
 package depgraphs.scraper;
 
+import depgraphs.data.FQN;
+import depgraphs.data.Local;
 import depgraphs.eventful.EventAdapter;
 import depgraphs.visitor.JavaVisitor;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import lang.JavaLexer;
@@ -33,11 +37,21 @@ public class JavaScraper extends Scraper {
 			JavaParser parser = new JavaParser(tokens);
 			ParseTree pt = parser.compilationUnit();
 			
-			JavaVisitor visitor = new JavaVisitor( f.getName().replace(".java", "") );
+			JavaVisitor visitor = new JavaVisitor();
+			
 			visitor.visit(pt);
 			
-			Collector<String> col = visitor.collect();
-//			System.out.println( col.toString() );
+			String name = f.getName().replace(".java", "");
+			
+			HashSet<String> set = visitor.col;
+			List<String>    fqn = visitor.fqn;
+			
+			fqn.add( name );
+			
+			Local.storage.add(fqn).get()
+				.setLocal(set)
+				.isTerminal = true;
+			
 			
 		} catch (IOException | RecognitionException ex) {
 			Logger.getLogger(JavaDirectiveScraper.class.getName()).log(Level.SEVERE, null, ex);

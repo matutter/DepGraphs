@@ -5,36 +5,38 @@
  */
 package depgraphs.visitor;
 
-//import depgraphs.network.ReferenceMap;
-import depgraphs.eventful.EventAdapter;
-import depgraphs.scraper.Collector;
+import depgraphs.data.Local;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lang.JavaParser;
 import static lang.JavaParser.Identifier;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
  *
  * @author Mat
+ * @param <T>
  */
 public class JavaVisitor<T> extends lang.JavaBaseVisitor<T> {
-	Collector<String> col;
+	public HashSet<String> col;
+	public List<String> fqn;
+	private final Consumer<List<String>> get;
 	
-//	functions
-//	@Override public T visitClassMemberDeclaration(@NotNull JavaParser.ClassMemberDeclarationContext ctx) {
-//		return visitChildren(ctx);
-//	}
-	
-	public JavaVisitor(String domain) {
+	public JavaVisitor() {
 		super();
-		col = new Collector<>(Arrays.asList( domain.split("//.") ));
-		System.out.println( this.col );
+		this.get = Local::add;
+		col = new HashSet<>();
 	}
-
+	
+	@Override public T visitPackageDeclaration(@NotNull JavaParser.PackageDeclarationContext ctx) {
+		fqn = ctx.getTokens(Identifier).stream().map(Object::toString).collect(Collectors.toList());
+		return visitChildren(ctx);
+	}
+	
 	@Override public T visitClassInstanceCreationExpression_lfno_primary(@NotNull JavaParser.ClassInstanceCreationExpression_lfno_primaryContext ctx) {
 		ctx.getTokens(Identifier).stream().map(TerminalNode::toString).forEach(col::add);
 		return visitChildren(ctx);
@@ -361,60 +363,18 @@ public class JavaVisitor<T> extends lang.JavaBaseVisitor<T> {
 	 */
 	@Override public T visitStaticInitializer(@NotNull JavaParser.StaticInitializerContext ctx) { return visitChildren(ctx); }
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitConditionalExpression(@NotNull JavaParser.ConditionalExpressionContext ctx) { return visitChildren(ctx); }
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitFieldDeclaration(@NotNull JavaParser.FieldDeclarationContext ctx) { return visitChildren(ctx); }
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitLeftHandSide(@NotNull JavaParser.LeftHandSideContext ctx) { return visitChildren(ctx); }
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitBasicForStatement(@NotNull JavaParser.BasicForStatementContext ctx) { return visitChildren(ctx); }
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitWhileStatement(@NotNull JavaParser.WhileStatementContext ctx) { return visitChildren(ctx); }
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitPackageDeclaration(@NotNull JavaParser.PackageDeclarationContext ctx) { return visitChildren(ctx); }
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
+
 	@Override public T visitLocalVariableDeclaration(@NotNull JavaParser.LocalVariableDeclarationContext ctx) {
 //		System.out.println(ctx.getChild(0).getClass() );
 		return visitChildren(ctx);
@@ -765,7 +725,8 @@ public class JavaVisitor<T> extends lang.JavaBaseVisitor<T> {
 	}
 
 	@Override public T visitImportDeclaration(@NotNull JavaParser.ImportDeclarationContext ctx) {
-//		System.out.println( ctx.getChild(0).getChild(1).getText() );
+		get.accept(Arrays.asList( ctx.getChild(0).getChild(1).getText().split("\\.") ) );
+		//col.addAll(col)
 		return visitChildren(ctx);
 	}
 
@@ -785,9 +746,5 @@ public class JavaVisitor<T> extends lang.JavaBaseVisitor<T> {
 		return visitChildren(ctx);
 	}
 
-	public Collector<String> collect() {
-		return col;
-	}
-	
 	
 }

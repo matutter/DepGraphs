@@ -5,9 +5,10 @@
  */
 package depgraphs.eventful;
 
+import depgraphs.DepGraphs;
+import depgraphs.data.Local;
 import depgraphs.env;
 import depgraphs.fs;
-import depgraphs.scraper.JavaDirectiveScraper;
 import depgraphs.scraper.JavaScraper;
 import depgraphs.ui.GStreamGraph;
 import java.io.File;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
 
-import java.util.Random;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -83,26 +83,7 @@ public class EventAdapter implements Runnable {
 					while( !nextTick.empty() ) {
 						String s = nextTick.lastElement();
 						nextTick.pop();
-						
-						env.log("parsing project " + s);
-
-						File f = new File( s );
-						if( f.exists() ) {
-							System.out.println("Parsing " + f.getName());
-							try {
-								Collection<File> files = fs.getSources( f.getCanonicalPath() , ".java");
-								JavaScraper scraper = new JavaScraper();
-
-								files.stream().filter( file -> file.exists() && file.canRead() ).forEach((file)->{
-									//env.log( file.getName() );
-									scraper.scrape(file, this);
-								});
-
-							} catch( IOException e ) {
-							//	env.log( f.getName() + " FAIL" );
-							}
-						}
-						
+						parse( s );
 					}
 					rendering = false;
 				} else {
@@ -123,6 +104,31 @@ public class EventAdapter implements Runnable {
 			} catch (InterruptedException ex) {
 				Logger.getLogger(EventAdapter.class.getName()).log(Level.SEVERE, null, ex);
 			}
+		}
+	}
+
+	private void parse(String s) {
+		File f = new File( s );
+		if( f.exists() ) {
+			System.out.println("Parsing " + f.getName());
+			try {
+				Collection<File> files = fs.getSources( f.getCanonicalPath() , ".java");
+				JavaScraper scraper = new JavaScraper();
+
+				int i = 0, max = files.size();
+				
+				for( File fi : files ) {
+					if( fi.exists() && fi.canRead() );
+						scraper.scrape(fi, this);
+					DepGraphs.setText( Integer.toString(++i) + "/" + max );
+					g.update( Local.storage );
+				}
+				
+				g.complete( Local.storage );
+				
+				DepGraphs.setText("DepGraphs");
+				
+			} catch( IOException ex ) { System.out.println(ex); }
 		}
 	}
 }

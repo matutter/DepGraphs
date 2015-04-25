@@ -32,14 +32,14 @@ public class JavaDirectiveVisitor extends JavaDirectiveBaseVisitor {
 			switch( ctx.getParent().getRuleIndex() ) {
 				case JavaDirectiveParser.RULE_l_package:
 
-					adapter.getGraph().addChain( ss );
-					this.tail = ss[ ss.length - 1 ];
-					
-				break;
-				case JavaDirectiveParser.RULE_l_directive:
-
-					adapter.getGraph().addChain(  ss );
-					adapter.getGraph().connect( tail , ss[0] );
+//					adapter.getGraph().addChain( ss );
+//					this.tail = ss[ ss.length - 1 ];
+//					
+//				break;
+//				case JavaDirectiveParser.RULE_l_directive:
+//
+//					adapter.getGraph().addChain(  ss );
+//					adapter.getGraph().connect( tail , ss[0] );
 
 				break;
 			}

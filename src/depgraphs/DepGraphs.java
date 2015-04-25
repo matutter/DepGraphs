@@ -10,6 +10,7 @@ import depgraphs.ui.GStreamGraph;
 import depgraphs.ui.Toolbar;
 import depgraphs.ui.UIBuilder;
 import depgraphs.ui.style.css;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.UIManager;
 
 
@@ -31,12 +33,18 @@ public class DepGraphs {
 	 */
 	
 	static JFileChooser select;
-
+	static JLabel progress;
+	
+	public static void setText( String s ) {
+		if( progress == null ) return;
+		progress.setText(s);
+	}
 	
 	public static void main(String[] args) {
 		looknFeel();
 		args = new String[]{ "C:\\Users\\Mat\\Documents\\NetBeansProjects\\DepGraphs\\src\\depgraphs" };
 
+		progress = new JLabel("DepGraphs");
 		
 		EventAdapter adapter = new EventAdapter();
 		Toolbar toolbar = new Toolbar();
@@ -73,6 +81,7 @@ public class DepGraphs {
 			});
 		});
 		JFrame f = builder.build();
+		f.add(progress, BorderLayout.SOUTH);
 		f.setVisible(true);
 		
 		Optional.ofNullable(args[0]).ifPresent(adapter::loadOnNextTick);

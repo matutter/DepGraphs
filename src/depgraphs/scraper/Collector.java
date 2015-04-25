@@ -5,7 +5,7 @@
  */
 package depgraphs.scraper;
 
-import depgraphs.ui.FQNTree;
+import depgraphs.data.FQN;
 import java.util.HashSet;
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
  */
 public final class Collector<T> extends HashSet<T> {
 	List<T> domain;
-	FQNTree fqn;
+	FQN fqn;
 	
 	public Collector(List<T> domain) {
 		super();
