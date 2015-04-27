@@ -13,9 +13,9 @@ import java.util.List;
  * @author Mat
  */
 public class Local {
-	public static final FQN<String,HashSet<String>> storage = new FQN();
-	public static void add( List<String> fqn ) {
-		storage.add( fqn.iterator() ).isTerminal = true;
-	}
+//	public static final FQN<String,HashSet<String>> storage = new FQN();
+//	public static void add( List<String> fqn ) {
+//		storage.add( fqn.iterator() ).isTerminal = true;
+//	}
 	
 }

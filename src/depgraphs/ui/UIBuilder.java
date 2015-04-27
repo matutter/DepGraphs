@@ -6,7 +6,7 @@
 package depgraphs.ui;
 
 import depgraphs.eventful.EventAdapter;
-import depgraphs.ui.style.css;
+import depgraphs.ui.graph.gmain;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import javax.swing.JFrame;
@@ -21,7 +21,7 @@ public class UIBuilder {
 	
 	EventAdapter adapter;
 	Toolbar toolbar;
-	GStreamGraph gs;
+//	GStreamGraph gs;
 	
 	Dimension dim;
 	
@@ -31,7 +31,7 @@ public class UIBuilder {
 		adapter = null;
 		toolbar = null;
 		dim = null;
-		gs = null;
+//		gs = null;
 		style = null;
 	}
 	
@@ -40,8 +40,8 @@ public class UIBuilder {
 		return this;
 	}
 
-	public UIBuilder useGraph( GStreamGraph gs  ) {
-		this.gs = gs;
+	public UIBuilder useGraph(   ) {
+//		this.gs = gs;
 		return this;
 	}
 	
@@ -63,11 +63,9 @@ public class UIBuilder {
 		JLayeredPane p = new JLayeredPane();
 		p.setLayout( new BorderLayout() );
 		
-		if( style == null )
-			style = css.Default;
 		
-		if(gs == null)
-			gs = new GStreamGraph( style );
+//		if(gs == null)
+//			gs = new GStreamGraph( style );
 		
 		if( toolbar == null ) 
 			toolbar = new Toolbar();
@@ -81,7 +79,8 @@ public class UIBuilder {
 //		toolbar.setBounds(0,0,400,40);
 		
 		p.add( toolbar.getComponent(), BorderLayout.NORTH );
-		p.add( gs.getComponent(), BorderLayout.CENTER );
+//		p.add( gs.getComponent(), BorderLayout.CENTER );
+		gmain.inst.attach( (c)->{p.add( c, BorderLayout.CENTER );}, p );
 		
 		p.setPreferredSize( dim );
 		
@@ -89,7 +88,7 @@ public class UIBuilder {
 		f.setPreferredSize( dim );
 		f.setSize( dim );
 
-		adapter.addGraph(gs).runInAnotherThread();
+		adapter.addGraph(gmain.inst).runInAnotherThread();
 		f.pack();
 		return f;
 	}

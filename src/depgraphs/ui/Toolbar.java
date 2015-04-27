@@ -5,33 +5,15 @@
  */
 package depgraphs.ui;
 
-import depgraphs.DepGraphs;
 import depgraphs.eventful.Eventful;
-import depgraphs.ui.style.css;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageFilter;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Enumeration;
 
-import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.GrayFilter;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import javax.swing.JToolBar;
 import javax.swing.Timer;
 
 /**
@@ -44,8 +26,13 @@ public final class Toolbar extends Eventful  {
 	
 	Timer loader;
 	IconBtn loadIco;
+	public IconBtn toolBtn;
+//	IconBtn removeBtn;
 	
 	public Toolbar() {
+		
+//		JMenu drop = new JComboBox();
+//		drop.add
 		p = new JPanel();
 		l = new JPanel();
 		r = new JPanel();
@@ -61,11 +48,16 @@ public final class Toolbar extends Eventful  {
 		IconBtn toggle_btn = new IconBtn( "layout", "lock.png", this );
 		IconBtn load_btn = new IconBtn( "load", "folder.png", this ).setAutoToggle(false);
 		loadIco = new IconBtn( null, "loader_sm.gif", this ).setAutoToggle(false);
+		IconBtn removeBtn = new IconBtn( "remove", "remove.png", this ).setAutoToggle(true);
+		toolBtn = new IconBtn( "tool", "tool.png", this ).setAutoToggle(false);
 		
+		removeBtn.altSwap();
 		toggle_btn.setActive(false);
 		
 		l.add(load_btn);
+		l.add(toolBtn);
 		r.add(toggle_btn);
+		r.add(removeBtn);
 		
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));

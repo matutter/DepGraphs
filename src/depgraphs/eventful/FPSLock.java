@@ -16,10 +16,10 @@ public final class FPSLock {
 	public FPSLock( int fps ) {
 		this.fps = fps;
 		delay = (long)Math.floor( 1000.0 / fps );
-		ping();
+		unlocked();
 	}
 	
-	public boolean ping() {
+	public boolean unlocked() {
 		if( System.currentTimeMillis() - lastTime >= delay ) {
 			lastTime = System.currentTimeMillis();
 			return true;

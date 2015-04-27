@@ -22,23 +22,25 @@ import org.antlr.v4.runtime.tree.ParseTree;
  *
  * @author Mat
  */
-public class JavaDirectiveScraper extends Scraper {
-	@Override
-	public void scrape( File f, EventAdapter adapter ) {
-		try {
-			CharStream input = new ANTLRFileStream(f.getCanonicalPath());
-			JavaDirectiveLexer lex = new JavaDirectiveLexer(input);
-			CommonTokenStream tokens = new  CommonTokenStream(lex);
-			JavaDirectiveParser parser = new JavaDirectiveParser(tokens);
-			ParseTree pt = parser.lang_source();
-			
-			JavaDirectiveVisitor visitor = new JavaDirectiveVisitor();
-			visitor.useAdapter(adapter);
-			visitor.visit(pt);
-		} catch (IOException | RecognitionException ex) {
-			env.log( f.getName() + " FAIL" );
-		}
-	}
+public class JavaDirectiveScraper
+//extends Scraper
+{
+//	@Override
+//	public void scrape( File f, EventAdapter adapter ) {
+//		try {
+//			CharStream input = new ANTLRFileStream(f.getCanonicalPath());
+//			JavaDirectiveLexer lex = new JavaDirectiveLexer(input);
+//			CommonTokenStream tokens = new  CommonTokenStream(lex);
+//			JavaDirectiveParser parser = new JavaDirectiveParser(tokens);
+//			ParseTree pt = parser.lang_source();
+//			
+//			JavaDirectiveVisitor visitor = new JavaDirectiveVisitor();
+//			visitor.useAdapter(adapter);
+//			visitor.visit(pt);
+//		} catch (IOException | RecognitionException ex) {
+//			env.log( f.getName() + " FAIL" );
+//		}
+//	}
 	
 	
 }

@@ -6,15 +6,14 @@
 package depgraphs.scraper;
 
 //import depgraphs.network.ReferenceMap;
-import depgraphs.eventful.EventAdapter;
 import java.io.File;
 
 /**
  *
  * @author Mat
  */
-public abstract class Scraper {
+public abstract class Scraper<T> {
 //	public ReferenceMap ref;
-	public abstract void scrape(File f, EventAdapter adapter) ;
+	public abstract T scrape(File f) ;
 //	public Scraper setRefMap(ReferenceMap ref) { this.ref = ref; return this; }
 }

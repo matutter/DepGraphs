@@ -6,19 +6,24 @@
 package depgraphs;
 
 import depgraphs.eventful.EventAdapter;
-import depgraphs.ui.GStreamGraph;
+import depgraphs.ui.Btn;
 import depgraphs.ui.Toolbar;
 import depgraphs.ui.UIBuilder;
-import depgraphs.ui.style.css;
+import depgraphs.ui.graph.gmain;
+import depgraphs.ui.graph.gtype;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.UIManager;
 
 
@@ -41,14 +46,14 @@ public class DepGraphs {
 	}
 	
 	public static void main(String[] args) {
+		gmain m = new gmain();
 		looknFeel();
-		args = new String[]{ "C:\\Users\\Mat\\Documents\\NetBeansProjects\\DepGraphs\\src\\depgraphs" };
+//		args = new String[]{ "C:\\Users\\Mat\\Documents\\NetBeansProjects\\DepGraphs\\src\\depgraphs" };
 
 		progress = new JLabel("DepGraphs");
 		
 		EventAdapter adapter = new EventAdapter();
 		Toolbar toolbar = new Toolbar();
-		GStreamGraph gs = new GStreamGraph( css.Default );
 		
 		select = new JFileChooser();
 		select.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -59,14 +64,13 @@ public class DepGraphs {
 			.useDim( new Dimension(700,800) )
 			.useToolbar( toolbar )
 			.useAdapter( adapter )
-			.useGraph( gs )
 			;
 		
 		adapter.setNoActivityIndicator(()->{ toolbar.showLoader(false); });
 		adapter.setActivityIndicator(()->{ toolbar.showLoader(true); });
 		
 		toolbar.on("layout-click", (Object sender, Object obj)->{
-			gs.toggleAuto();
+//			gs.toggleAuto();
 		});
 		
 		toolbar.on("load-click", (Object sender, Object obj)->{
@@ -80,11 +84,42 @@ public class DepGraphs {
 				});
 			});
 		});
+		
+		// popup tool menu
+		JPopupMenu pop = new JPopupMenu("Toolbar");
+		JMenuItem importToggle = new JMenuItem(new AbstractAction(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				gmain.inst.toggle( gtype.IMPORT );
+			}
+		});
+		importToggle.setText("Toggle Imports");
+		
+		JMenuItem clearVis = new JMenuItem(new AbstractAction(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				gmain.inst.clear();
+			}
+		});
+		clearVis.setText("Clear Vis");
+		
+		pop.add(importToggle);
+		pop.add(clearVis);
+		
+		toolbar.on("tool-click", (Object sender, Object obj)->{
+			pop.setInvoker(toolbar.toolBtn);
+			Point p = toolbar.toolBtn.getLocationOnScreen();
+			p.y += toolbar.toolBtn.getHeight();
+			pop.setLocation( p );
+			pop.setVisible(true);
+		});
+		
 		JFrame f = builder.build();
 		f.add(progress, BorderLayout.SOUTH);
 		f.setVisible(true);
 		
-		Optional.ofNullable(args[0]).ifPresent(adapter::loadOnNextTick);
+		if( args.length > 0 )
+			adapter.loadOnNextTick(args[0]);
 		
 	}
 

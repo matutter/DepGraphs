@@ -5,14 +5,12 @@
  */
 package depgraphs.scraper;
 
-import depgraphs.data.FQN;
-import depgraphs.data.Local;
-import depgraphs.eventful.EventAdapter;
+import depgraphs.data.VisualFQN;
+import depgraphs.ui.graph.gImportContext;
 import depgraphs.visitor.JavaVisitor;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import lang.JavaLexer;
@@ -27,9 +25,15 @@ import org.antlr.v4.runtime.tree.ParseTree;
  *
  * @author Mat
  */
-public class JavaScraper extends Scraper {
+public class JavaScraper extends Scraper<Optional<VisualFQN>> {
+		public gImportContext ctx, head;
+		
+		public JavaScraper(gImportContext ctx) {
+			this.ctx = ctx;
+		}
+		
 		@Override
-		public void scrape(File f, EventAdapter adapter) {
+		public Optional<VisualFQN> scrape(File f) {
 		try {
 			CharStream input = new ANTLRFileStream(f.getCanonicalPath());
 			JavaLexer lex = new JavaLexer(input);
@@ -39,22 +43,17 @@ public class JavaScraper extends Scraper {
 			
 			JavaVisitor visitor = new JavaVisitor();
 			
+			visitor.name = f.getName().replace(".java","");
+			visitor.consumerCtx = ctx;
 			visitor.visit(pt);
-			
-			String name = f.getName().replace(".java", "");
-			
-			HashSet<String> set = visitor.col;
-			List<String>    fqn = visitor.fqn;
-			
-			fqn.add( name );
-			
-			Local.storage.add(fqn).get()
-				.setLocal(set)
-				.isTerminal = true;
-			
+			try {
+				visitor.jpackage.setLocal( visitor.imports );
+				return Optional.ofNullable( visitor.jpackage );
+			} catch( NullPointerException ex ) { System.err.println( f.getName() + " failed to parse " ); }
 			
 		} catch (IOException | RecognitionException ex) {
 			Logger.getLogger(JavaDirectiveScraper.class.getName()).log(Level.SEVERE, null, ex);
 		}
+		return Optional.empty();
 	}
 }

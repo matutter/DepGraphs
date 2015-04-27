@@ -10,7 +10,8 @@ import depgraphs.data.Local;
 import depgraphs.env;
 import depgraphs.fs;
 import depgraphs.scraper.JavaScraper;
-import depgraphs.ui.GStreamGraph;
+import depgraphs.ui.graph.gImportContext;
+import depgraphs.ui.graph.gmain;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -31,9 +32,9 @@ public class EventAdapter implements Runnable {
 	Stack<String> nextTick;
 	Optional<Runnable> noActivity = Optional.empty();
 	Optional<Runnable> activity = Optional.empty();
-	GStreamGraph g;
+	gmain g;
 
-	public GStreamGraph getGraph() {
+	public gmain getGraph() {
 		return g;
 	}
 	
@@ -41,7 +42,7 @@ public class EventAdapter implements Runnable {
 		nextTick = new Stack<>();
 	}
 	
-	public EventAdapter addGraph( GStreamGraph g ) {
+	public EventAdapter addGraph( gmain g ) {
 		this.g = g;
 		return this;
 	}
@@ -64,7 +65,7 @@ public class EventAdapter implements Runnable {
 	}
 	
 	public synchronized EventAdapter clear( Consumer<EventAdapter> cb ) {
-		this.g.clear();
+//		this.g.clear();
 		env.log("removing  edges");
 		cb.accept( this );
 		return this;
@@ -73,6 +74,7 @@ public class EventAdapter implements Runnable {
 	@Override
 	public void run() {
 		System.out.println(" > Sym starting");
+//		g.vis.run();
 		FPSLock lock = new FPSLock(60);
 		int limit = 100;
 		boolean rendering = true;
@@ -94,8 +96,8 @@ public class EventAdapter implements Runnable {
 						Thread.sleep( lock.delay );
 						noActivity.ifPresent(Runnable::run);
 					}
-					if( lock.ping() ) {
-						g.refresh();
+					if( lock.unlocked() ) {
+//						g.refresh();
 					}
 					else {
 						Thread.sleep( lock.delay );
@@ -110,23 +112,29 @@ public class EventAdapter implements Runnable {
 	private void parse(String s) {
 		File f = new File( s );
 		if( f.exists() ) {
-			System.out.println("Parsing " + f.getName());
+//			System.out.println("Parsing " + f.getName());
+			g.setRootTitle(f.getName());
+			
+			gImportContext ctx = new gImportContext();
+			ctx.visual = g.ROOT.getRow();
+			ctx.qualifier = f.getName();
 			try {
-				Collection<File> files = fs.getSources( f.getCanonicalPath() , ".java");
-				JavaScraper scraper = new JavaScraper();
+				Collection<File> files = fs.getSources( f.getCanonicalPath() , "(.java)|(.png)|(.gif)|(.g4)");
+				JavaScraper scraper = new JavaScraper( ctx );
 
 				int i = 0, max = files.size();
 				
 				for( File fi : files ) {
-					if( fi.exists() && fi.canRead() );
-						scraper.scrape(fi, this);
-					DepGraphs.setText( Integer.toString(++i) + "/" + max );
-					g.update( Local.storage );
+					DepGraphs.setText( Integer.toString(++i) + "/" + max + "   " + fi.getName() + "  ("+ (fi.length()/1000.0) +"KB)" );
+					if( fi.exists() && fi.canRead() ) {
+						g.update( scraper.scrape(fi) );
+					} else {
+						System.out.println( fi.getName() + " skipped" );
+					}
 				}
-				
-				g.complete( Local.storage );
-				
-				DepGraphs.setText("DepGraphs");
+				DepGraphs.setText("Linking...");
+				g.complete( ctx );
+				DepGraphs.setText(f.getName());
 				
 			} catch( IOException ex ) { System.out.println(ex); }
 		}
