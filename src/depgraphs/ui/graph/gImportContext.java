@@ -24,7 +24,6 @@ public class gImportContext extends VisualFQN<String,List<VisualFQN>> {
 	
 	public void setPackage( List<String> jp ) {
 		jpackage = add(jp);
-//		jpackage.ifPresent( p -> p.setHidden(true) );
 	}
 	
 	@Override
@@ -34,7 +33,5 @@ public class gImportContext extends VisualFQN<String,List<VisualFQN>> {
 		else 
 			return "Unknown Package";
 	}
-
-	
 	
 }

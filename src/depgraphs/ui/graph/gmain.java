@@ -17,14 +17,17 @@ import prefuse.visual.VisualItem;
 /**
  *
  * @author Mat
+ * @param <T>
  */
-public final class gmain {
+public final class gmain<T extends VisualFQN<String,List<VisualFQN>>> {
 	
 	public final Graph     g; 
 	public final gVisual   vis;
 	public final gDisplay  disp;
 	public final Node      ROOT;
 	long time_offset = 0, time_last = 0, future = 1500;
+	boolean toggleImportVis = true;
+	boolean toggleEdgeVis = true;
 	
 	public static gmain inst;
 	
@@ -36,8 +39,8 @@ public final class gmain {
 		g.addColumn(gconst.LABEL, gconst.COLUMN_TYPE[0]);
 		g.addColumn(gconst.TYPE, gconst.COLUMN_TYPE[1]);
 		g.addColumn(gconst.STATE, boolean.class);
-		g.addColumn(gconst.LOCK, boolean.class);
-		g.addColumn(gconst.COLOR, int.class);
+//		g.addColumn(gconst.LOCK, boolean.class);
+//		g.addColumn(gconst.COLOR, int.class);
 		
 		ROOT = g.addNode();
 		setRootTitle( "DepGraphs" );
@@ -50,7 +53,7 @@ public final class gmain {
 		ROOT.set(gconst.LABEL, title);
 		ROOT.set(gconst.TYPE, gtype.PROJECT);
 		ROOT.set(gconst.STATE, false);
-		ROOT.set(gconst.LOCK, Boolean.FALSE);
+//		ROOT.set(gconst.LOCK, Boolean.FALSE);
 	}
 	
 	public void attach( Consumer<Component> cb , Component parent) {
@@ -71,12 +74,12 @@ public final class gmain {
 		return time_last;
 	}
 	
-	public void packageConnect(VisualFQN parent, VisualFQN child) {
+	public void packageConnect(T parent, VisualFQN child) {
 		if( parent.visual == ROOT.getRow() ) return;
 		if( parent.visual == -1 ) {
 			node( parent, gtype.IMPORT  );
 			parent.parent.ifPresent( p->{
-				packageConnect((VisualFQN) p, parent );
+				packageConnect((T) p, parent );
 			});
 		}
 		if( child.visual == -1 )
@@ -84,32 +87,30 @@ public final class gmain {
 		connect( parent, child, gtype.NOMINAL_EDGE );
 	}
 	
-	public void complete(VisualFQN ctx) {
-		ctx.stream().forEach( f -> {
-			VisualFQN v1 = (VisualFQN)f;
-			((Optional<List>)v1.local).ifPresent( l -> {
+	public void complete(T ctx) {
+		ctx.stream().forEach( v1 -> {
+			
+			v1.local.ifPresent( l -> {
 
 				if( v1.visual == -1 )
 					node( v1, gtype.SOURCE );
 				
 				v1.parent.ifPresent( p -> {
-					packageConnect((VisualFQN) p, v1 );
+					packageConnect((T) p, v1 );
 				});
 				
 				l.stream().forEach( q->{
 					if( q instanceof VisualFQN ) {
-						VisualFQN v2 = (VisualFQN) q;
+						T v2 = (T) q;
 						
 						if( v2.visual == -1 )
 							node( v2, gtype.IMPORT );
 						
 						v2.parent.ifPresent( p -> {
-							packageConnect((VisualFQN) p, v2 );
+							packageConnect((T) p, v2 );
 						});
 						
 						connect( v1, v2, gtype.IMPORT_EDGE );
-						
-					} else {
 					}
 				});
 			});
@@ -119,20 +120,17 @@ public final class gmain {
 		}
 	}
 
-	public void update(Optional<VisualFQN> ctx) {
-		if( ctx.isPresent() ) {
-			VisualFQN p = ctx.get();
-			if( p.visual != -1 ) {
-//				System.out.println( "Updating " + ctx.get().name() );
-
-			} else {
+	public void update(Optional<T> ctx) {
+		ctx.ifPresent(p->{
+			if( p.visual == -1 ) {
 				node(p, gtype.SOURCE);
-				Stack<VisualFQN> seq = new Stack<>();
+				Stack<T> seq = new Stack<>();
 
 				while( p.parent.isPresent() ) {
 					seq.push(p);
-					p=(VisualFQN) p.parent.get();
+					p = (T) p.parent.get();
 				}
+				
 				VisualFQN other = seq.pop();
 				while( !seq.empty() ) {
 					if( p.visual == -1 )
@@ -145,9 +143,7 @@ public final class gmain {
 				}
 				connect(p,other);
 			}
-		} else {
-			System.out.println( "no package!" );
-		}
+		});
 	}
 	
 	Node node( VisualFQN v, gtype type ) {
@@ -156,7 +152,7 @@ public final class gmain {
 			n.set(gconst.LABEL, v.name().trim());
 			n.set(gconst.TYPE, type);
 			n.set(gconst.STATE, Boolean.TRUE);
-			n.set(gconst.LOCK, Boolean.FALSE);
+//			n.set(gconst.LOCK, Boolean.FALSE);
 			v.visual = n.getRow();
 			return n;
 		}
@@ -179,38 +175,77 @@ public final class gmain {
 		connect( v1, v2, gtype.NOMINAL_EDGE );
 	}
 	
-	boolean visToggle = false;
+	
+	
+	public void toggleIMPORT() {
+		toggle( gtype.IMPORT );
+	}
 	
 	public void toggle(gtype t) {
+		toggleImportVis = !toggleImportVis;
 		vis.cancel(Visualization.ALL_ITEMS);
-		Iterator it = vis.getGroup(gconst.NODES).tuples();
-		while( it.hasNext() ) {
-			VisualItem i = (VisualItem) it.next();
+		vis.getGroup(gconst.NODES).tuples().forEachRemaining((item)->{
+			VisualItem i = (VisualItem) item;
 			if( t.equals( i.get(gconst.TYPE) ) ) {
-				i.setVisible(visToggle);
+				i.setVisible(toggleImportVis);
 				Node n = (Node) i;
 				n.edges().forEachRemaining(e->{
 					VisualItem edge = (VisualItem) e;
-					edge.setVisible(visToggle);
+					edge.setVisible(toggleImportVis && toggleEdgeVis);
 				});
 			}
-		}
-		gmain.inst.vis.runAt(gconst.FILTER, td());
-		visToggle = !visToggle;
+		});
+		vis.run(gconst.REPAINT);
 	}
 
+	public void resetHIGHLIGHTED() {
+		vis.getGroup(gconst.NODES).tuples()
+			.forEachRemaining(t->((VisualItem)t)
+				.setHighlighted(false));
+		vis.run(gconst.REPAINT);
+	}
+	
+	public void showOnlyHIGHLIGHT() {
+		toggleEdgeVis = !toggleEdgeVis;
+		if( toggleEdgeVis ) {
+			// restore all to visible
+			vis.getGroup(gconst.EDGES).tuples().forEachRemaining(t->{
+				((VisualItem)t).setVisible(toggleEdgeVis);
+			});
+			// respect and leave imports hidden
+			if( toggleImportVis ) {
+				toggleImportVis = !toggleImportVis;
+				toggleIMPORT();
+			}
+		} else {
+			// set all not connecting highlighted edges not-visible
+			vis.getGroup(gconst.EDGES).tuples().forEachRemaining(t->{
+				Edge edge = (Edge) t;
+				if( !((VisualItem)edge.getTargetNode()).isHighlighted() )
+					if( !((VisualItem)edge.getSourceNode()).isHighlighted() )
+						((VisualItem)edge).setVisible(false);
+			});
+		}
+		vis.run(gconst.REPAINT);
+	}
+	
+	public void filter() {
+		vis.run(gconst.FILTER);
+	}
+	
 	public void clear() {
 		vis.cancel(Visualization.ALL_ITEMS);
-		Iterator e = g.edges();
-		while( e.hasNext() ) {
-			e.next();
-			e.remove();
-		}
-		e = g.nodes();
-		while( e.hasNext() ) {
-			e.next();
-			e.remove();
-		}
+		clear(g.edges());
+		Iterator e = g.nodes();
+		e.next(); // preserve node 0 == ROOT
+		clear(g.nodes());
 		vis.run(gconst.FILTER);
+	}
+	
+	void clear(Iterator it) {
+		while( it.hasNext() ) {
+			it.next();
+			it.remove();
+		}
 	}
 }

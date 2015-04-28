@@ -29,6 +29,7 @@ public interface FQN<T> {
 	
 	public Stream fullStream() ;
 	
+	public boolean hasLocal();
 	/**
 	 *
 	 * @return Stream<FQN<T,U>> of terminal nodes.

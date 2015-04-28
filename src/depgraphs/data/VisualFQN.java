@@ -12,8 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import prefuse.data.Node;
-import prefuse.data.Tuple;
 
 /**
  *
@@ -59,6 +57,11 @@ public class VisualFQN<T,U extends Collection> implements FQN<T> {
 	
 	public void setVisual( Integer v ) {
 		visual =  v;
+	}
+	
+	@Override
+	public boolean hasLocal() {
+		return this.local.isPresent();
 	}
 	
 	@Override

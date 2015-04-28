@@ -6,6 +6,7 @@
 package depgraphs;
 
 import depgraphs.eventful.EventAdapter;
+import depgraphs.ui.ActionAssist;
 import depgraphs.ui.Btn;
 import depgraphs.ui.Toolbar;
 import depgraphs.ui.UIBuilder;
@@ -48,12 +49,11 @@ public class DepGraphs {
 	public static void main(String[] args) {
 		gmain m = new gmain();
 		looknFeel();
-//		args = new String[]{ "C:\\Users\\Mat\\Documents\\NetBeansProjects\\DepGraphs\\src\\depgraphs" };
 
-		progress = new JLabel("DepGraphs");
-		
 		EventAdapter adapter = new EventAdapter();
 		Toolbar toolbar = new Toolbar();
+
+		progress = new JLabel("DepGraphs");
 		
 		select = new JFileChooser();
 		select.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -69,43 +69,20 @@ public class DepGraphs {
 		adapter.setNoActivityIndicator(()->{ toolbar.showLoader(false); });
 		adapter.setActivityIndicator(()->{ toolbar.showLoader(true); });
 		
-		toolbar.on("layout-click", (Object sender, Object obj)->{
-//			gs.toggleAuto();
-		});
-		
-		toolbar.on("load-click", (Object sender, Object obj)->{
-			adapter.clear( (ctx)->{
-				Toolbar bar = (Toolbar)sender;
-				select.showDialog(bar.getComponent(), "Choose a JAVA Project Directory");
-				Optional.ofNullable(select.getSelectedFile()).ifPresent( f -> {
-					try {
-						ctx.loadOnNextTick( f.getCanonicalPath() );
-					} catch (IOException ex) {}
-				});
-			});
-		});
-		
+
 		// popup tool menu
 		JPopupMenu pop = new JPopupMenu("Toolbar");
-		JMenuItem importToggle = new JMenuItem(new AbstractAction(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				gmain.inst.toggle( gtype.IMPORT );
-			}
-		});
-		importToggle.setText("Toggle Imports");
+		ActionAssist.ApplyMenuAction(pop, "Reset Selection", gmain.inst::resetHIGHLIGHTED);
+		ActionAssist.ApplyMenuAction(pop, "Edge Visibility", gmain.inst::showOnlyHIGHLIGHT);
+		ActionAssist.ApplyMenuAction(pop, "Toggle Imports", gmain.inst::toggleIMPORT);
+		ActionAssist.ApplyMenuAction(pop, "Filter Layout", gmain.inst::filter);
+		pop.addSeparator();
+		ActionAssist.ApplyMenuAction(pop, "Clear", gmain.inst::clear);
 		
-		JMenuItem clearVis = new JMenuItem(new AbstractAction(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				gmain.inst.clear();
-			}
-		});
-		clearVis.setText("Clear Vis");
-		
-		pop.add(importToggle);
-		pop.add(clearVis);
-		
+		JFrame f = builder.build();
+		f.add(progress, BorderLayout.SOUTH);
+		f.setVisible(true);
+
 		toolbar.on("tool-click", (Object sender, Object obj)->{
 			pop.setInvoker(toolbar.toolBtn);
 			Point p = toolbar.toolBtn.getLocationOnScreen();
@@ -114,10 +91,16 @@ public class DepGraphs {
 			pop.setVisible(true);
 		});
 		
-		JFrame f = builder.build();
-		f.add(progress, BorderLayout.SOUTH);
-		f.setVisible(true);
-		
+		toolbar.on("load-click", (Object sender, Object obj)->{
+			Toolbar bar = (Toolbar)sender;
+			select.showDialog(bar.getComponent(), "Choose a JAVA Project Directory");
+			Optional.ofNullable(select.getSelectedFile()).ifPresent( file -> {
+				try {
+					adapter.loadOnNextTick( file.getCanonicalPath() );
+				} catch (IOException ex) {}
+			});
+		});
+
 		if( args.length > 0 )
 			adapter.loadOnNextTick(args[0]);
 		

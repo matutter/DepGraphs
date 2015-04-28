@@ -126,14 +126,10 @@ public class gDisplay extends Display {
 				try {
 					String s = item.getString(gconst.LABEL);
 					s += "(".concat( item.getString(gconst.TYPE) ) + ")";
-					if( item.canGetBoolean(gconst.LOCK) ) {
-						if( item.getBoolean(gconst.LOCK) )
-							s+= " LOCKED";
-					}
+					if( item.isHighlighted() )
+						s+= " SELECTED";
                     title.setText(s);
-				} catch( Exception ex ) {
-					
-				}
+				} catch( Exception ex ) {}
 			}
 			
 			@Override

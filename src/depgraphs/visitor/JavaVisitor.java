@@ -45,7 +45,6 @@ public class JavaVisitor<T> extends lang.JavaBaseVisitor<T> {
 		l.add( name );
 		jpackage = consumerCtx.add(l).get();
 		jpackage.markTerminal();
-//		consumerCtx.setPackage(l);
 		
 		return visitChildren(ctx);
 	}

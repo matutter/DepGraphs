@@ -26,9 +26,7 @@ public class ToggleControl extends ControlAdapter {
 	@Override
 	public void itemClicked(VisualItem item, MouseEvent e) {
 		if( item.isInGroup(m_group) ) {
-			if( item.canGetBoolean(m_field) ) {
-				item.set(m_field, !item.getBoolean(m_field) );
-			}
+			item.setHighlighted(!item.isHighlighted());
 		}
 	}
 }

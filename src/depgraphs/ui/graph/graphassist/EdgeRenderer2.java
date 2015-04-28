@@ -118,7 +118,7 @@ public class EdgeRenderer2 extends EdgeRenderer {
 		
 
 		
-		if(  src.getBoolean(gconst.LOCK) || vsrc.isHover() ) {
+		if(  vsrc.isHighlighted() || vsrc.isHover() ) {
 			int color = gconst.COLOR_EDGE;
 			switch( src_t ) {
 				case PROJECT:
@@ -141,7 +141,7 @@ public class EdgeRenderer2 extends EdgeRenderer {
 			item.setStroke(gconst.EDGE_STROKE);
 		}
 		
-		if( (dst.getBoolean(gconst.LOCK) || vdst.isHover()) && gtype.SOURCE.equals(src_t) && src_t.equals(dst_t) ) {
+		if( (vdst.isHighlighted() || vdst.isHover()) && gtype.SOURCE.equals(src_t) && src_t.equals(dst_t) ) {
 			item.setStrokeColor( gconst.SRC_ALT.getRGB() );
 			item.setStroke(gconst.EDGE_STROKE_THICK);
 		}

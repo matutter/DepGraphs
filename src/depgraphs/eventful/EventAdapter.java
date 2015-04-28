@@ -1,37 +1,29 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package depgraphs.eventful;
 
-import depgraphs.DepGraphs;
-import depgraphs.data.Local;
-import depgraphs.env;
-import depgraphs.fs;
-import depgraphs.scraper.JavaScraper;
 import depgraphs.ui.graph.gImportContext;
+import depgraphs.scraper.JavaScraper;
 import depgraphs.ui.graph.gmain;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Optional;
+import depgraphs.DepGraphs;
+import depgraphs.fs;
 
-import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
-import java.util.function.Consumer;
+import java.util.concurrent.Executors;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+import java.util.Collection;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.Stack;
+import java.io.File;
 
 /**
  *
  * @author Mat
  */
 public class EventAdapter implements Runnable {
-	Stack<String> nextTick;
 	Optional<Runnable> noActivity = Optional.empty();
 	Optional<Runnable> activity = Optional.empty();
+	Stack<String> scheduler;
 	gmain g;
 
 	public gmain getGraph() {
@@ -39,7 +31,7 @@ public class EventAdapter implements Runnable {
 	}
 	
 	public EventAdapter() {
-		nextTick = new Stack<>();
+		scheduler = new Stack<>();
 	}
 	
 	public EventAdapter addGraph( gmain g ) {
@@ -61,49 +53,22 @@ public class EventAdapter implements Runnable {
 	}
 	
 	public void loadOnNextTick(String s) {
-		nextTick.push(s);
-	}
-	
-	public synchronized EventAdapter clear( Consumer<EventAdapter> cb ) {
-//		this.g.clear();
-		env.log("removing  edges");
-		cb.accept( this );
-		return this;
+		scheduler.push(s);
 	}
 	
 	@Override
 	public void run() {
-		System.out.println(" > Sym starting");
-//		g.vis.run();
-		FPSLock lock = new FPSLock(60);
-		int limit = 100;
-		boolean rendering = true;
+		FPSLock lock = new FPSLock(1000/60);
 		while( !Thread.interrupted() ) {
 			try {
-				if( rendering ) {
+				if( !scheduler.empty() ) {
 					activity.ifPresent(Runnable::run);
-					while( !nextTick.empty() ) {
-						String s = nextTick.lastElement();
-						nextTick.pop();
-						parse( s );
-					}
-					rendering = false;
-				} else {
-					
-					if( !nextTick.empty() )
-						rendering = true;
-					else {
-						Thread.sleep( lock.delay );
-						noActivity.ifPresent(Runnable::run);
-					}
-					if( lock.unlocked() ) {
-//						g.refresh();
-					}
-					else {
-						Thread.sleep( lock.delay );
-					}
-				}
-			} catch (InterruptedException ex) {
+					scheduler.stream().forEach(this::parse);
+					noActivity.ifPresent(Runnable::run);
+					scheduler.clear();
+				} 
+				Thread.sleep( lock.delay );
+			} catch (Exception ex) {
 				Logger.getLogger(EventAdapter.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
@@ -112,14 +77,12 @@ public class EventAdapter implements Runnable {
 	private void parse(String s) {
 		File f = new File( s );
 		if( f.exists() ) {
-//			System.out.println("Parsing " + f.getName());
 			g.setRootTitle(f.getName());
-			
 			gImportContext ctx = new gImportContext();
 			ctx.visual = g.ROOT.getRow();
 			ctx.qualifier = f.getName();
 			try {
-				Collection<File> files = fs.getSources( f.getCanonicalPath() , "(.java)|(.png)|(.gif)|(.g4)");
+				Collection<File> files = fs.getSources( f.getCanonicalPath() , ".java");
 				JavaScraper scraper = new JavaScraper( ctx );
 
 				int i = 0, max = files.size();
@@ -127,7 +90,11 @@ public class EventAdapter implements Runnable {
 				for( File fi : files ) {
 					DepGraphs.setText( Integer.toString(++i) + "/" + max + "   " + fi.getName() + "  ("+ (fi.length()/1000.0) +"KB)" );
 					if( fi.exists() && fi.canRead() ) {
-						g.update( scraper.scrape(fi) );
+						try {
+							g.update( scraper.scrape(fi) );
+						} catch( Exception ex ) {
+							Logger.getLogger(EventAdapter.class.getName()).log(Level.SEVERE, null, ex);
+						}
 					} else {
 						System.out.println( fi.getName() + " skipped" );
 					}

@@ -10,6 +10,7 @@ import depgraphs.ui.graph.gImportContext;
 import depgraphs.visitor.JavaVisitor;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +26,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
  *
  * @author Mat
  */
-public class JavaScraper extends Scraper<Optional<VisualFQN>> {
+public class JavaScraper extends Scraper<Optional<VisualFQN<String,List<VisualFQN>>>> {
 		public gImportContext ctx, head;
 		
 		public JavaScraper(gImportContext ctx) {
@@ -33,7 +34,7 @@ public class JavaScraper extends Scraper<Optional<VisualFQN>> {
 		}
 		
 		@Override
-		public Optional<VisualFQN> scrape(File f) {
+		public Optional<VisualFQN<String,List<VisualFQN>>> scrape(File f) {
 		try {
 			CharStream input = new ANTLRFileStream(f.getCanonicalPath());
 			JavaLexer lex = new JavaLexer(input);
